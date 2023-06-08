@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 import base64
 
-pip install streamlit-option-menu
-
 st.set_page_config(layout="wide")
 
 menu = st.container()
