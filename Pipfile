@@ -9,4 +9,3 @@ name = "pypi"
 
 [requires]
 python_version = "3.10"
-streamlit_option_menu = "0.3.2"
