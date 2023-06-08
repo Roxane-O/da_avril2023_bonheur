@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit_option_menu
 from streamlit_option_menu import option_menu
 import streamlit.components.v1 as html
 from  PIL import Image
@@ -31,7 +32,7 @@ with menu:
 			"container": {"padding": "5!important", "background-color": "#41644A", "border-radius" : "4px"},
 			"icon": {"font-size": "25px", "vertical-align" : "middle"}, 
 			"nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px", "color": "#F2E3DB", "--hover-color": "rgba(242, 227, 219, 0.3)"},
-			"nav-link-selected": {"background-color": "rgba(242, 227, 219, 0.5)", "color" : "#41644A"},
+			"nav-link-selected": {"background-color": "#F2E3DB", "color" : "#41644A", "border-radius" : "4px"},
 		}
 	)
 
