@@ -8,6 +8,10 @@ streamlit_option_menu = "*"
 scikit-learn = "*"
 matplotlib = "*"
 seaborn = "*"
+streamlit-folium = "*"
+folium = "*"
+json = "*"
+geopy = "*"
 
 [dev-packages]
 

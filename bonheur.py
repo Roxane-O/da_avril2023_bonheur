@@ -1,4 +1,10 @@
 import streamlit as st
+import folium
+import json
+from folium.plugins import Draw
+from streamlit_folium import st_folium
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 from streamlit_option_menu import option_menu
 from  PIL import Image
 import numpy as np
@@ -32,6 +38,7 @@ st.markdown(
     [data-testid="stMarkdownContainer"] ul {{ list-style-position: inside; }}
     [data-testid="stCaptionContainer"], [data-testid="stExpander"], [data-testid="stMarkdownContainer"], h3, [data-testid="stImage"], [data-testid="stDataFrameResizable"], div.row-widget.stSelectbox {{ width: 80% !important; margin: 0 auto; }}
     [data-testid="stImage"] img {{ width: 100% !important; }}
+    iframe {{ display: block; margin: 0 auto; width: 900px; }}
     </style>
     """,
     unsafe_allow_html=True
@@ -180,6 +187,120 @@ elif choose == "Visualisations":
 
 	with st.expander("Pourquoi ce graphique ?"):
 		st.write("Ce graphique nous permet de vérifier la distribution du Ladder score par région")
+
+	visu3 = st.container()
+	visu3.markdown("- Matrice de corrélation du dataframe 2021")
+
+	df1_corr = df1.drop(['Country name', 'Regional indicator'], axis = 1)
+
+	fig3 = plt.figure(figsize=(15,10))
+	correlation_matrix = df1_corr.corr()
+	sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+	plt.title("Matrice de corrélation")
+	visu3.write(fig3)
+
+	with st.expander("Pourquoi ce graphique ?"):
+		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe portant sur l'année 2021")
+
+	visu4 = st.container()
+	visu4.markdown("- Matrice de corrélation du dataframe longitudinal")
+
+	df_final = pd.read_csv('datasets/df_final.csv')
+	df_final_corr = df_final.drop(['Country name', 'year'], axis = 1)
+
+	fig4 = plt.figure(figsize=(10,10))
+	correlation_matrix = df_final_corr.corr()
+	sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+	plt.title("Matrice de corrélation")
+	visu4.write(fig4)
+
+	with st.expander("Pourquoi ce graphique ?"):
+		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe longitudinal")
+
+
+
+	geolocator = Nominatim(user_agent='myapplication')
+
+	latitudes = []
+	longitudes = []
+
+	#Boucle pour remplir les listes à partir des noms de pays du df1
+	for country in df1['Country name']:
+	    try:
+	        location = geolocator.geocode(country, timeout=10)
+	        if location:
+	            latitudes.append(location.latitude)
+	            longitudes.append(location.longitude)
+	        else:
+	            latitudes.append(None)
+	            longitudes.append(None)
+	    except GeocoderTimedOut as e:
+	        print("Error: geocode failed on input %s with message %s" % (country, e))
+	        latitudes.append(None)
+	        longitudes.append(None)
+	        
+	#Coordonnées
+	coordinates = list(zip(latitudes, longitudes))
+
+	df1_geo = df1
+	df1_geo['latitude']=latitudes
+	df1_geo['longitude']=longitudes
+
+	# Correction des coordonnés (à poursuivre)
+	df1_geo.loc[df1_geo['Country name'] == 'Georgia', ['latitude', 'longitude']] = [42, 43.3]
+	df1_geo.loc[df1_geo['Country name'] == 'Taiwan Province of China', ['latitude', 'longitude']] = [25.03, 121.3]
+	df1_geo.loc[df1_geo['Country name'] == 'Hong Kong S.A.R. of China', ['latitude', 'longitude']] = [22.39, 114.109497]
+
+	# Charger les données GeoJSON des pays
+	with open('json/world-countries.json') as f:
+	    geo_data = json.load(f)
+
+	# Créer une carte centrée sur le monde
+	m = folium.Map(location=[0, 0], zoom_start=2)
+
+	# Créer une fonction pour définir la couleur en fonction du score Ladder
+	def get_color(score):
+	    if score > 7.5:
+	        return 'darkgreen'
+	    elif score > 7:
+	        return 'green'
+	    elif score > 6.5:
+	        return 'lightgreen'
+	    elif score > 6:
+	        return 'yellow'
+	    elif score > 5.5:
+	        return 'orange'
+	    else:
+	        return 'red'
+
+	# Ajouter une couche de remplissage à la carte pour chaque pays
+	folium.Choropleth(
+	    geo_data=geo_data,
+	    name='choropleth',
+	    data=df1_geo,
+	    columns=['Country name', 'Ladder score'],
+	    key_on='feature.properties.name',
+	    fill_color='YlOrRd',
+	    fill_opacity=0.7,
+	    line_opacity=0.2,
+	    legend_name='Ladder Score',
+	    highlight=True,
+	    overlay=True,
+	    show=False,
+	).add_to(m)
+
+	# Parcourir le dataframe et ajouter un marqueur pour chaque pays
+	for index, row in df1_geo.iterrows():
+	    pays = row['Country name']
+	    score = row['Ladder score']
+	    # Récupérer les coordonnées géographiques du pays
+	    coord = (row['latitude'], row['longitude'])
+	    # Ajouter un marqueur avec la couleur correspondante
+	    folium.Marker(location=coord, 
+	                  icon=folium.Icon(color=get_color(score)), 
+	                  tooltip=f"{pays}: {score}").add_to(m)
+
+	output = st_folium(m, width=900, height=500)
 
 ####################
 #   MODELISATION   #
