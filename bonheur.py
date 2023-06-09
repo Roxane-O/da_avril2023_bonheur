@@ -55,7 +55,7 @@ st.markdown(
 
 with menu:
 	choose = option_menu(None,["Introduction", "Datasets", "Visualisations", "Modélisations", "Conclusion"],
-		icons=['globe-americas', 'database', 'bar-chart-line', 'calculator', 'balloon-heart'],
+		icons=['globe-americas', 'database', 'bar-chart-line', 'calculator', 'emoji-smile'],
 		default_index=0,
 		orientation="horizontal",
 		styles={
