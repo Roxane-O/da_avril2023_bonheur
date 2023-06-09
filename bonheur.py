@@ -1019,8 +1019,24 @@ elif choose == "Modélisations":
 #   CONCLUSION   #
 ##################
 elif choose == "Conclusion":
-	conclu1, conclu2, conclu3 = st.columns([1,8,1])
-	conclu2.write("Conclusion")
+	conclu1 = st.container()
+
+	conclu1.subheader("Conclusion")
+
+	conclu1.write("Les deux meilleurs modèles pour prédire l'indice de bonheur brut national sont la régression linéaire multiple utilisant une approche comparative de modèles et le random forest classifier.")
+	conclu1.write("Nous souhaitions connaître les variables ayant le plus de poids dans le calcul du score de bonheur afin d'en tirer une équation.")
+
+	conclu1.caption("**Bonheur** = 0.46 × PIB + 0.38 × Liberté presse + 0.32 × Espérance de vie en bonne santé - 0.26 × Droit + 0.21 × Soutien social + 0.19 × Liberté choix de vie - 0.18 × Années de scolarité - 0.18 × Chômage")
+
+	conclu1.write("Inclure graph 'Poids de chaque variable...'")
+
+	conclu1.write("Faire formulaire calcul score de bonheur")
+
+
+
+
+
+
 
 
 
