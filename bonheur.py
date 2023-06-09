@@ -189,7 +189,8 @@ elif choose == "Visualisations":
 		st.write("Ce graphique nous permet de vérifier la distribution du Ladder score par région")
 
 	visu3 = st.container()
-	visu3.markdown("- Matrice de corrélation du dataframe 2021")
+	visu3.subheader("Matrices de corrélation des deux datasets")
+	visu3.markdown("- Dataset 2021")
 
 	df1_corr = df1.drop(['Country name', 'Regional indicator'], axis = 1)
 
@@ -203,7 +204,7 @@ elif choose == "Visualisations":
 		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe portant sur l'année 2021")
 
 	visu4 = st.container()
-	visu4.markdown("- Matrice de corrélation du dataframe longitudinal")
+	visu4.markdown("- Dataset longitudinal")
 
 	df_final = pd.read_csv('datasets/df_final.csv')
 	df_final_corr = df_final.drop(['Country name', 'year'], axis = 1)
@@ -218,6 +219,8 @@ elif choose == "Visualisations":
 		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe longitudinal")
 
 
+	visu5 = st.container()
+	visu5.subheader("Carte du monde selon le score de bonheur")
 
 	geolocator = Nominatim(user_agent='myapplication')
 
