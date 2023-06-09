@@ -10,7 +10,6 @@ matplotlib = "*"
 seaborn = "*"
 streamlit-folium = "*"
 folium = "*"
-json = "*"
 geopy = "*"
 
 [dev-packages]
