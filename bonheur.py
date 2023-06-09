@@ -22,7 +22,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 
-st.set_page_config(layout="wide")
+st.set_page_config(
+	layout = "wide", 
+	page_title = "Le bonheur national brut",  # String or None. Strings get appended with "• Streamlit". 
+	page_icon = ":smile:"  # String, anything supported by st.image, or None.
+)
 
 menu = st.container()
 
@@ -1010,9 +1014,6 @@ elif choose == "Modélisations":
 	with tab2:
 		# Centrer le titre de la page
 		st.markdown("<h2 style='text-align: center;'>Modèles de Classification</h2>", unsafe_allow_html=True)
-
-
-
 
 ##################
 #   CONCLUSION   #
