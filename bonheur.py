@@ -1015,6 +1015,161 @@ elif choose == "Modélisations":
 		# Centrer le titre de la page
 		st.markdown("<h2 style='text-align: center;'>Modèles de Classification</h2>", unsafe_allow_html=True)
 
+		tab2021, tabLongi = st.tabs(["Dataset 2021", "Dataset Longitudinal"])
+
+		############
+		#   2021   #
+		############
+		with tab2021:
+			df2021_final = pd.read_csv('datasets/df2021_final.csv')
+
+
+			# Afficher le sous-titre
+			st.markdown("<h3>Dataset 2021</h3>", unsafe_allow_html=True)
+
+
+			# Afficher le texte
+			st.markdown("Aperçu des variables prédictives (avant standardisation):")
+
+			# Affichage du df
+			st.dataframe(df2021_final.head())
+
+
+			# Afficher le sous-titre "Modèles"
+			st.subheader("Modèles")
+
+			# Définir les options de la liste déroulante
+			options3 = ["Sélectionner modèle", "Régression Logistique", "Arbre de Décision", "Random Forest Classifier"]
+
+			# Afficher la liste déroulante
+			selected_model3 = st.selectbox("Choisissez un modèle pour explorer ses résultats et évaluations :", options3)
+
+
+			# Afficher le contenu correspondant au modèle sélectionné
+			if selected_model3 == "Régression Logistique":
+				st.markdown("- Standardisation des VI")
+				st.markdown("- Entrainement 80% / Test 20%")
+				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
+				st.markdown("- Accuracy train : 0.8660714285714286")
+				st.markdown("- Accuracy test : 0.6071428571428571")
+
+
+				# Afficher l'image correspondante
+				image = Image.open("img/modelisations/reg log 2021.png")
+				st.image(image, caption="Matrice de confusion", use_column_width=True)
+
+			# Afficher le contenu correspondant au modèle sélectionné
+			elif selected_model3 == "Arbre de Décision":
+				st.markdown("- Standardisation des VI")
+				st.markdown("- Entrainement 80% / Test 20%")
+				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
+				st.markdown("- Sélection des 3 variables les + influentes et ré-entraînement")
+				st.markdown("- Accuracy train : 1.0")
+				st.markdown("- Accuracy test : 0.5357142857142857")
+
+				# Afficher l'image correspondante
+				image = Image.open("img/modelisations/arbre 2021 1.png")
+				st.image(image, caption="Poids de chaque variable", use_column_width=True)
+
+				# Afficher l'image correspondante
+				image = Image.open("img/modelisations/arbre 2021 2.png")
+				st.image(image, caption="Matrice de confusion", use_column_width=True)
+
+				# Afficher l'image correspondante
+				image = Image.open("img/modelisations/arbre 2021 3.png")
+				st.image(image, caption="Arbre de décision", use_column_width=True)
+
+			# Afficher le contenu correspondant au modèle sélectionné
+			elif selected_model3 == "Random Forest Classifier":
+				st.markdown("- Standardisation des VI")
+				st.markdown("- Entrainement 80% / Test 20%")
+				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
+				st.markdown("- Réechantillonnage")
+
+				# Afficher l'image correspondante
+				image = Image.open("img/modelisations/random 2021 1.png")
+				st.image(image, caption="Matrice de confusion", use_column_width=True)
+
+			else:
+				st.write("Aucun modèle sélectionné")
+
+		with tabLongi:
+			####################
+			#   Longitudinal   #
+			####################
+			df_final = pd.read_csv('datasets/df_final.csv')
+
+			# Afficher le sous-titre
+			st.markdown("<h3>Dataset 2011 - 2020</h3>", unsafe_allow_html=True)
+
+			# Afficher le texte
+			st.markdown("Aperçu des variables prédictives (avant standardisation):")
+
+			# Affichage du df
+			st.dataframe(df_final.head())
+
+			# Afficher le sous-titre "Modèles"
+			st.subheader("Modèles")
+
+			# Définir les options de la liste déroulante
+			options4 = ["Sélectionner modèle", "Régression Logistique", "Arbre de Décision", "Random Forest Classifier"]
+
+			# Afficher la liste déroulante
+			#selected_model4 = st.selectbox("Choisissez un modèle pour explorer ses résultats et évaluations :", options4)
+			selected_model4 = st.selectbox("Choisissez un modèle pour explorer ses résultats et évaluations :", options4, key="model4_selection")
+
+			# Afficher le contenu correspondant au modèle sélectionné
+			if selected_model4 == "Régression Logistique":
+				st.markdown("- Standardisation des VI")
+				st.markdown("- Entrainement 80% / Test 20%")
+				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
+			    
+			    # Afficher l'image correspondante
+				image = Image.open("img/modelisations/reg log longi.png")
+				st.image(image, caption="Matrice de confusion", use_column_width=True)
+			    
+				image = Image.open("img/modelisations/reg log longi 2.png")
+				st.image(image, caption="Hyperparamètres", use_column_width=True)
+			        
+
+			    
+			# Afficher le contenu correspondant au modèle sélectionné
+			elif selected_model4 == "Arbre de Décision":
+				st.markdown("- Standardisation des VI")
+				st.markdown("- Entrainement 80% / Test 20%")
+				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
+				st.markdown("- Sélection des 3 variables les + influentes et ré-entraînement")
+			       
+			    # Afficher l'image correspondante
+				image = Image.open("img/modelisations/arbre longi 1.png")
+				st.image(image, caption="Poids de chaque variable", use_column_width=True)
+			    
+			    # Afficher l'image correspondante
+				image = Image.open("img/modelisations/arbre longi 2.png")
+				st.image(image, caption="Matrice de confusion", use_column_width=True)
+			    
+				image = Image.open("img/modelisations/arbre longi 3.png")
+				st.image(image, caption="Hyperparamètres", use_column_width=True)
+
+
+			# Afficher le contenu correspondant au modèle sélectionné
+			elif selected_model4 == "Random Forest Classifier":
+				st.markdown("- Standardisation des VI")
+				st.markdown("- Entrainement 80% / Test 20%")
+				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
+				st.markdown("- Réechantillonnage")
+			       
+			    # Afficher l'image correspondante
+				image = Image.open("img/modelisations/random longi.png")
+				st.image(image, caption="Matrice de confusion", use_column_width=True)
+			    
+				image = Image.open("img/modelisations/random longi 2.png")
+				st.image(image, caption="Hyperparamètres", use_column_width=True)
+
+			else:
+				st.write("Aucun modèle sélectionné")
+
+
 ##################
 #   CONCLUSION   #
 ##################
