@@ -39,6 +39,11 @@ st.markdown(
     [data-testid="stCaptionContainer"], [data-testid="stExpander"], [data-testid="stMarkdownContainer"], h3, [data-testid="stImage"], [data-testid="stDataFrameResizable"], div.row-widget.stSelectbox {{ width: 80% !important; margin: 0 auto; }}
     [data-testid="stImage"] img {{ width: 100% !important; }}
     iframe {{ display: block; margin: 0 auto; width: 900px; }}
+    [data-baseweb="tab-list"] [data-testid="stMarkdownContainer"] {{ width: 100% !important; }}
+    .stTabs .stTabs [data-baseweb="tab-list"] {{ width: fit-content; margin: 0 auto; }}
+    .stTabs .stTabs [data-baseweb="tab-border"] {{ background-color: transparent;}}
+    [data-testid="stVerticalBlock"] > .stTabs {{ width: 80%; margin: 0 auto; }}
+    [data-testid="stVerticalBlock"] > .stTabs [data-testid="stVerticalBlock"] > .stTabs {{ width: 100%; }}
     </style>
     """,
     unsafe_allow_html=True
