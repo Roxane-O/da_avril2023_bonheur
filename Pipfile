@@ -12,6 +12,7 @@ streamlit-folium = "*"
 folium = "*"
 geopy = "*"
 statsmodels = "*"
+openpyxl = "*"
 
 [dev-packages]
 
