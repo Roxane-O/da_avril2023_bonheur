@@ -80,7 +80,7 @@ if choose == "Introduction":
 
 	colLeft, colMid, colRight = st.columns([1, 8, 1])
 
-	colMid.header("COMMENT PREDIRE LE NIVEAU DE BONHEUR D'UN PAYS ?")
+	colMid.header("COMMENT PRÉDIRE LE NIVEAU DE BONHEUR D'UN PAYS ?")
 	colMid.write("\n\n")
 	colMid.write("\n\n")
 	colMid.image('img/globe_beach.jpg')
