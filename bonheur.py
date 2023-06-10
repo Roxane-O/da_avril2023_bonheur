@@ -1516,23 +1516,17 @@ elif choose == "Conclusion":
 	else:
 		conclu2 = st.container()
 
-		ss = conclu2.radio(
-			"Lorsque vous avez des soucis, avez-vous des proches sur qui compter ?",
-			('Oui', 'Non'),
-			horizontal = True)
+		ss = conclu2.slider("Lorsque vous avez des soucis, avez-vous des proches sur qui compter ? 0 = Pas d'accord, 10 = D'accord",
+			0, 10)
 
-		social_support = 0
-		if ss == "Oui":
-			social_support = 1
+		social_support = ss / 10
 
-		lc = conclu2.radio(
-			"Êtes-vous satisfait de votre liberté à faire des choix de vie ?",
-			('Oui', 'Non'),
-			horizontal = True)
+		
+		lc = conclu2.slider("Êtes-vous satisfait de votre liberté à faire des choix de vie ? 0 = Pas satisfait, 10 = Satisfait",
+			0, 10)
 
-		life_choices = 0
-		if lc == "Oui":
-			life_choices = 1
+		life_choices = lc / 10
+		
 
 		selected_country = option
 
