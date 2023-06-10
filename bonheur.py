@@ -1606,6 +1606,10 @@ elif choose == "Conclusion":
 	colImgLeft, colImgMid, colImgRight = st.columns([2, 8, 2])
 	colImgMid.pyplot(fig)
 
+	colLeft, colMid, colRight = st.columns([1, 8, 1])
+
+	colMid.write("Ce graphique nous indique donc que les variables ayant le plus de poids sont le PIB, la liberté de presse et l'espérance de vie en bonne santé. Nos analyses nous ont permis de mettre en place un quiz permettant de prédire son score de bonheur personnel.")
+
 ############
 #   QUIZ   #
 ############
