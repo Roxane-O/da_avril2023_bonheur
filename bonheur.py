@@ -1559,7 +1559,7 @@ elif choose == "Conclusion":
 		col3.write(df_row["Country name"].item())
 
 		col4.write("**Score général du pays :**")
-		col4.write(df_row["Ladder score"].item())
+		col4.write(np.round(df_row["Ladder score"].item(), 2))
 
 
 
