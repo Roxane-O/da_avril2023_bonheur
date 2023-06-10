@@ -85,7 +85,7 @@ with menu:
 if choose == "Introduction":
 	intro = st.container()
 	
-	intro.write('Ce projet a été fait dans le cadre de la formation Data Analyst au sein de l’organisme Data Scientest, promotion bootcamp avril 2023. Nous avons, à partir des connaissances acquise et de notre curiosité, tenté de répondre à la question suivante :') 
+	intro.write('Ce projet a été réalisé dans le cadre de la formation Data Analyst au sein de l’organisme Data Scientest, promotion bootcamp avril 2023. Nous avons, à partir des connaissances acquises et de notre curiosité, tenté de répondre à la question suivante :') 
 	intro.header("QUELS FACTEURS ONT LE PLUS D'INFLUENCE SUR LE BONHEUR DES INDIVIDUS ?")
 	intro.image('img/globe_beach.jpg')
 	intro.write('Ainsi, nous avons pu observer des facteurs politiques, économiques et sociaux.')
@@ -109,14 +109,22 @@ elif choose == "Datasets":
 	data.subheader('1.Première étape : La récupération des données')
 	data.write("La source principale des données est le [World Happiness Report](https://worldhappiness.report/), une enquête phare sur l'état du bonheur mondial.")
 	data.write("Deux jeux de données de type csv ont pu être téléchargé sur [Kaggle](https://www.kaggle.com/ajaypalsinghlo/world-happiness-report-2021): ")
-	data.markdown("- le World Happiness Report")
-	data.markdown("- le World Happiness Report 2021")
-	data.write("Ces jeux de données seront les sources initiales de nos données. Nous avons décidé de les agrémenter d’autres indicateurs pertinents.")
+	
+	with st.expander("le World Happiness Report"):
+		whr = pd.read_csv('datasets/world-happiness-report.csv')
+		st.dataframe(whr)
 
-	data.subheader('2. Étoffer nos jeux de données')
+	with st.expander("le World Happiness Report 2021"):
+		whr2021 = pd.read_csv('datasets/world-happiness-report-2021.csv')
+		st.dataframe(whr2021)
+
+
+	st.write("Ces jeux de données seront les sources initiales de nos données. Nous avons décidé de les agrémenter d’autres indicateurs pertinents.")
+
+	st.subheader('2. Étoffer nos jeux de données')
 
 	with st.expander("Avec un indicateur au sujet de la guerre"):
-		st.write("""Création d’un dataset grâce aux données récupérée dans une [page wikipedia](https://en.wikipedia.org/wiki/List_of_armed_conflicts_in_2020.)  à l’aide du webscrapping via la librairie beautiful soup.""")
+		st.write("""Création d’un dataset grâce aux données récupérées dans une [page wikipedia](https://en.wikipedia.org/wiki/List_of_armed_conflicts_in_2020.)  à l’aide du webscrapping via la librairie beautiful soup.""")
 		st.write("""En téléchargement libre sur le [site de l'ucdp](https://ucdp.uu.se/encyclopedia)""")
 
 	with st.expander("Avec un indicateur au sujet du chômage"):
@@ -128,7 +136,7 @@ elif choose == "Datasets":
 	data2 = st.container()
 
 	data2.subheader('3. Mutualisation et préparation des dataframes finaux')
-	data2.write("Nous choisissons de préparer les deux datasets, l’un sur 2021, l’autre sur plusieurs années.Les datasets ont été mergés par la colonne “Country”.")
+	data2.write("Nous choisissons de préparer les deux datasets, l’un sur 2021, l’autre sur plusieurs années. Les datasets ont été mergés par la colonne “Country”.")
 	data2.image("img/df2021_final.jpg")
 	data2.subheader('Dataframe obtenu :')
 
@@ -364,7 +372,7 @@ elif choose == "Modélisations":
 			#   Choix modèle   #
 			####################
 			# Définir les options de la liste déroulante
-			options = ["Sélectionner modèle", "Régression Linéaire Multiple", "Régression Ridge", "Régression Lasso", "Régression Elastic Net"]
+			options = ["Sélectionner un modèle", "Régression Linéaire Multiple", "Régression Ridge", "Régression Lasso", "Régression Elastic Net"]
 
 			# Afficher la liste déroulante
 			selected_model = st.selectbox("Sélectionnez un modèle", options)
@@ -637,7 +645,7 @@ elif choose == "Modélisations":
 			st.subheader("Modèles")
 
 			# Définir les options de la deuxième liste déroulante
-			options_2 = ["Sélectionner modèle", "Régression Linéaire Multiple", "Régression Ridge", "Régression Lasso", "Régression Elastic Net"]
+			options_2 = ["Sélectionner un modèle", "Régression Linéaire Multiple", "Régression Ridge", "Régression Lasso", "Régression Elastic Net"]
 
 			# Afficher la deuxième liste déroulante
 			selected_model_2 = st.selectbox("Sélectionnez un modèle (Dataset 2011 - 2020)", options_2)
@@ -1072,7 +1080,7 @@ elif choose == "Modélisations":
 			st.subheader("Modèles")
 
 			# Définir les options de la liste déroulante
-			options3 = ["Sélectionner modèle", "Régression Logistique", "Arbre de Décision", "Random Forest Classifier"]
+			options3 = ["Sélectionner un modèle", "Régression Logistique", "Arbre de Décision", "Random Forest Classifier"]
 
 			# Afficher la liste déroulante
 			selected_model3 = st.selectbox("Choisissez un modèle pour explorer ses résultats et évaluations :", options3)
@@ -1237,7 +1245,7 @@ elif choose == "Modélisations":
 			st.subheader("Modèles")
 
 			# Définir les options de la liste déroulante
-			options4 = ["Sélectionner modèle", "Régression Logistique", "Arbre de Décision", "Random Forest Classifier"]
+			options4 = ["Sélectionner un modèle", "Régression Logistique", "Arbre de Décision", "Random Forest Classifier"]
 
 			# Afficher la liste déroulante
 			#selected_model4 = st.selectbox("Choisissez un modèle pour explorer ses résultats et évaluations :", options4)
