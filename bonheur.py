@@ -1497,11 +1497,74 @@ elif choose == "Conclusion":
 
 	conclu1.write("Inclure graph 'Poids de chaque variable...'")
 
-	conclu1.write("Faire formulaire calcul score de bonheur")
+
+	df2021_final = pd.read_csv("datasets/df2021_final.csv")
+	cols = ['Logged GDP per capita', 'Press_Freedom', 'Healthy life expectancy', 'Law', 'Social support', 'Freedom to make life choices', 'Schooling', 'Unemployment rate']
+
+	options = []
+	options.append('Pays')
+	for country in df2021_final["Country name"]:
+		options.append(country)
+
+	option = st.selectbox(
+		'Choisissez votre pays',
+		options)
+
+	if option == 'Pays':
+		st.write('Veuillez sélectionner un pays')
+
+	else:
+		conclu2 = st.container()
+
+		ss = conclu2.radio(
+			"Lorsque vous avez des soucis, avez-vous des proches sur qui compter ?",
+			('Oui', 'Non'),
+			horizontal = True)
+
+		social_support = 0
+		if ss == "Oui":
+			social_support = 1
+
+		lc = conclu2.radio(
+			"Êtes-vous satisfait de votre liberté à faire des choix de vie ?",
+			('Oui', 'Non'),
+			horizontal = True)
+
+		life_choices = 0
+		if lc == "Oui":
+			life_choices = 1
+
+		selected_country = option
+
+		df_row = df2021_final[df2021_final["Country name"] == selected_country]
+
+		X_train = df2021_final[cols]
+		y_train = df2021_final['Ladder score']
+
+		df_row['Social support'] = social_support
+		df_row['Freedom to make life choices'] = life_choices
+
+		X_test = df_row[cols]
+
+		# Création d'un objet modèle de régression linéaire
+		model = LinearRegression()
+
+		# Entraînement du modèle sur le jeu d'entraînement
+		model.fit(X_train, y_train)
+
+		pred_test = model.predict(X_test)
 
 
+		col1, col2, col3 = st.columns(3)
 
+		col1.write("Score de bonheur personnel : ")
+		col1.write(pred_test.item())
 
+		col2.write("Pays sélectionné :")
+		col2.write(df_row["Country name"].item())
+
+		col3.write("Score général du pays :")
+		col3.write(df_row["Ladder score"].item())
 
 
 
