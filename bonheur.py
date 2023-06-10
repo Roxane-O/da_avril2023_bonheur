@@ -63,7 +63,6 @@ st.markdown(
 	    [data-baseweb="checkbox"] [data-testid="stMarkdownContainer"] {{ width: 100% !important }}
 	    div.stSlider {{ width: 50% !important; margin: 0 auto }}
 	    span[aria-disabled="true"] {{ background-color: #263A29 !important; color: #F2E3DB; }}
-	    [data-baseweb="select"] [data-baseweb="icon"] {{ display: none; }}
     </style>
     """,
     unsafe_allow_html=True
