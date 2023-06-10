@@ -1,26 +1,38 @@
+# base
 import streamlit as st
+import numpy as np
+import pandas as pd
+from streamlit_option_menu import option_menu
+from  PIL import Image
+
+# dataviz
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# map
 import folium
 import json
 from folium.plugins import Draw
 from streamlit_folium import st_folium
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
-from streamlit_option_menu import option_menu
-from  PIL import Image
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import base64
+
+# preprocessing
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import RidgeCV
-from sklearn.linear_model import Lasso
-from sklearn.linear_model import ElasticNetCV
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+
+# modeles
+from sklearn import tree
+from sklearn.linear_model import LogisticRegression, LinearRegression, RidgeCV, Lasso, ElasticNetCV
+from sklearn.ensemble import RandomForestClassifier
+
+#resultats
+from sklearn.metrics import classification_report, mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, confusion_matrix
+from sklearn.tree import plot_tree 
+
+# stats
+import statsmodels.api as sm
 
 st.set_page_config(
 	layout = "wide", 
@@ -34,20 +46,21 @@ menu.title('Le bonheur national brut')
 st.markdown(
     f"""
     <style>
-    .css-10trblm.eqr7zpz0 {{ color: #263A29; }}
-    p {{ margin-bottom: 0.5rem; }}
-    p a {{ text-decoration: none; color: #E86A33 !important}}
-    p a:hover, p a:visited, p a:focus {{ text-decoration: none; font-weight: 600;}}
-    h2 {{ text-align: center; }}
-    [data-testid="stMarkdownContainer"] ul {{ list-style-position: inside; }}
-    [data-testid="stCaptionContainer"], [data-testid="stExpander"], [data-testid="stMarkdownContainer"], h3, [data-testid="stImage"], [data-testid="stDataFrameResizable"], div.row-widget.stSelectbox {{ width: 80% !important; margin: 0 auto; }}
-    [data-testid="stImage"] img {{ width: 100% !important; }}
-    iframe {{ display: block; margin: 0 auto; width: 900px; }}
-    [data-baseweb="tab-list"] [data-testid="stMarkdownContainer"] {{ width: 100% !important; }}
-    .stTabs .stTabs [data-baseweb="tab-list"] {{ width: fit-content; margin: 0 auto; }}
-    .stTabs .stTabs [data-baseweb="tab-border"] {{ background-color: transparent;}}
-    [data-testid="stVerticalBlock"] > .stTabs {{ width: 80%; margin: 0 auto; }}
-    [data-testid="stVerticalBlock"] > .stTabs [data-testid="stVerticalBlock"] > .stTabs {{ width: 100%; }}
+	    .css-10trblm.eqr7zpz0 {{ color: #263A29; }}
+	    p {{ margin-bottom: 0.5rem; }}
+	    p a {{ text-decoration: none; color: #E86A33 !important}}
+	    p a:hover, p a:visited, p a:focus {{ text-decoration: none; font-weight: 600;}}
+	    h2 {{ text-align: center; }}
+	    [data-testid="stMarkdownContainer"] ul {{ list-style-position: inside; }}
+	    [data-testid="stCaptionContainer"], [data-testid="stExpander"], [data-testid="stMarkdownContainer"], h3, [data-testid="stImage"], div.row-widget.stSelectbox {{ width: 80% !important; margin: 0 auto; }}
+	    [data-testid="stImage"] img {{ width: 100% !important; }}
+	    iframe {{ display: block; margin: 0 auto; width: 900px; }}
+	    [data-baseweb="tab-list"] [data-testid="stMarkdownContainer"] {{ width: 100% !important; }}
+	    .stTabs .stTabs [data-baseweb="tab-list"] {{ width: fit-content; margin: 0 auto; }}
+	    .stTabs .stTabs [data-baseweb="tab-border"] {{ background-color: transparent;}}
+	    [data-testid="stVerticalBlock"] > .stTabs {{ width: 80%; margin: 0 auto; }}
+	    [data-testid="stVerticalBlock"] > .stTabs [data-testid="stVerticalBlock"] > .stTabs {{ width: 100%; }}
+	    [data-baseweb="checkbox"] [data-testid="stMarkdownContainer"] {{ width: 100% !important }}
     </style>
     """,
     unsafe_allow_html=True
@@ -73,7 +86,7 @@ if choose == "Introduction":
 	intro = st.container()
 	
 	intro.write('Ce projet a été fait dans le cadre de la formation Data Analyst au sein de l’organisme Data Scientest, promotion bootcamp avril 2023. Nous avons, à partir des connaissances acquise et de notre curiosité, tenté de répondre à la question suivante :') 
-	intro.header("QUELS FACTEURS ONT LE PLUS D'INFLUENCE SURLE BONHEUR DES INDIVIDUS ?")
+	intro.header("QUELS FACTEURS ONT LE PLUS D'INFLUENCE SUR LE BONHEUR DES INDIVIDUS ?")
 	intro.image('img/globe_beach.jpg')
 	intro.write('Ainsi, nous avons pu observer des facteurs politiques, économiques et sociaux.')
 	intro.write('L’objectif de ce projet est : ')
@@ -197,37 +210,6 @@ elif choose == "Visualisations":
 	with st.expander("Pourquoi ce graphique ?"):
 		st.write("Ce graphique nous permet de vérifier la distribution du Ladder score par région")
 
-	visu3 = st.container()
-	visu3.subheader("Matrices de corrélation des deux datasets")
-	visu3.markdown("- Dataset 2021")
-
-	df1_corr = df1.drop(['Country name', 'Regional indicator'], axis = 1)
-
-	fig3 = plt.figure(figsize=(15,10))
-	correlation_matrix = df1_corr.corr()
-	sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
-	plt.title("Matrice de corrélation")
-	visu3.write(fig3)
-
-	with st.expander("Pourquoi ce graphique ?"):
-		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe portant sur l'année 2021")
-
-	visu4 = st.container()
-	visu4.markdown("- Dataset longitudinal")
-
-	df_final = pd.read_csv('datasets/df_final.csv')
-	df_final_corr = df_final.drop(['Country name', 'year'], axis = 1)
-
-	fig4 = plt.figure(figsize=(10,10))
-	correlation_matrix = df_final_corr.corr()
-	sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
-	plt.title("Matrice de corrélation")
-	visu4.write(fig4)
-
-	with st.expander("Pourquoi ce graphique ?"):
-		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe longitudinal")
-
-
 	visu5 = st.container()
 	visu5.subheader("Carte du monde selon le score de bonheur")
 
@@ -314,11 +296,41 @@ elif choose == "Visualisations":
 
 	output = st_folium(m, width=900, height=500)
 
+	visu3 = st.container()
+	visu3.subheader("Matrices de corrélation des deux datasets")
+	visu3.markdown("- Dataset 2021")
+
+	df1_corr = df1.drop(['Country name', 'Regional indicator'], axis = 1)
+
+	fig3 = plt.figure(figsize=(15,10))
+	correlation_matrix = df1_corr.corr()
+	sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+	plt.title("Matrice de corrélation")
+	visu3.write(fig3)
+
+	with st.expander("Pourquoi ce graphique ?"):
+		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe portant sur l'année 2021")
+
+	visu4 = st.container()
+	visu4.markdown("- Dataset longitudinal")
+
+	df_final = pd.read_csv('datasets/df_final.csv')
+	df_final_corr = df_final.drop(['Country name', 'year'], axis = 1)
+
+	fig4 = plt.figure(figsize=(10,10))
+	correlation_matrix = df_final_corr.corr()
+	sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+	plt.title("Matrice de corrélation")
+	visu4.write(fig4)
+
+	with st.expander("Pourquoi ce graphique ?"):
+		st.write("Ce graphique nous apporte des informations concernant la corrélation entre les différentes variables du dataframe longitudinal")
+
 ####################
 #   MODELISATION   #
 ####################
 elif choose == "Modélisations":
-	tab1, tab2 = st.tabs(["Modèles quantitatifs", "Modèles de classification"])
+	tab1, tab2, tab3 = st.tabs(["Modèles quantitatifs", "Modèles de classification", "Simulation"])
 
 	with tab1:
 		# Centrer le titre de la page
@@ -1021,8 +1033,7 @@ elif choose == "Modélisations":
 		#   2021   #
 		############
 		with tab2021:
-			df2021_final = pd.read_csv('datasets/df2021_final.csv')
-
+			df= pd.read_csv('datasets/df2021_final.csv')
 
 			# Afficher le sous-titre
 			st.markdown("<h3>Dataset 2021</h3>", unsafe_allow_html=True)
@@ -1034,6 +1045,28 @@ elif choose == "Modélisations":
 			# Affichage du df
 			st.dataframe(df2021_final.head())
 
+			# Création de la colonne catégorielle correspondant au Ladder score divisé en 3 classes (tercile)
+			df['hapiness_categ'] = pd.qcut(df['Ladder score'], q=[0, 0.33, 0.66, 1], labels=['Low', 'Medium', 'High'])
+
+			# Supression des colonnes inutiles
+			df = df.drop(['Country name', 'Regional indicator', 'Ladder score'], axis=1)
+
+			#Separer variable cible des variables explicatives
+			X = df.drop('hapiness_categ', axis = 1)
+			y = df['hapiness_categ']
+
+			# Divisez les données en ensembles d'entraînement et de test :
+			X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state = 42)
+
+			#Standardiser les valeurs
+			sc = StandardScaler()
+			X_train[X_train.columns] = sc.fit_transform(X_train[X_train.columns])
+			X_test[X_test.columns] = sc.transform(X_test[X_test.columns])
+
+			# Encodage de la variable cible
+			le = LabelEncoder()
+			y_train = le.fit_transform(y_train)
+			y_test = le.transform(y_test)
 
 			# Afficher le sous-titre "Modèles"
 			st.subheader("Modèles")
@@ -1053,10 +1086,22 @@ elif choose == "Modélisations":
 				st.markdown("- Accuracy train : 0.8660714285714286")
 				st.markdown("- Accuracy test : 0.6071428571428571")
 
+				reglog = LogisticRegression(random_state = 42)
+				reglog.fit(X_train, y_train)
 
-				# Afficher l'image correspondante
-				image = Image.open("img/modelisations/reg log 2021.png")
-				st.image(image, caption="Matrice de confusion", use_column_width=True)
+				#Predire les classes
+				y_pred = reglog.predict(X_test)
+
+				col1, col2, col3 = st.columns([2,4,2])
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col2.caption('Matrice de confusion')
+				col2.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col2.caption('Rapport de classification')
+				col2.dataframe(df_report)
 
 			# Afficher le contenu correspondant au modèle sélectionné
 			elif selected_model3 == "Arbre de Décision":
@@ -1067,17 +1112,59 @@ elif choose == "Modélisations":
 				st.markdown("- Accuracy train : 1.0")
 				st.markdown("- Accuracy test : 0.5357142857142857")
 
-				# Afficher l'image correspondante
-				image = Image.open("img/modelisations/arbre 2021 1.png")
-				st.image(image, caption="Poids de chaque variable", use_column_width=True)
+				# entrainement de l'arbre de décision
+				clf = tree.DecisionTreeClassifier(random_state = 42)
+				clf.fit(X_train, y_train)
 
-				# Afficher l'image correspondante
-				image = Image.open("img/modelisations/arbre 2021 2.png")
-				st.image(image, caption="Matrice de confusion", use_column_width=True)
+				y_pred = clf.predict(X_test)
 
-				# Afficher l'image correspondante
-				image = Image.open("img/modelisations/arbre 2021 3.png")
-				st.image(image, caption="Arbre de décision", use_column_width=True)
+				# Création d'un DataFrame pour stocker les importances des features
+				feat_importances = pd.DataFrame(clf.feature_importances_, index=X.columns, columns=["Importance"])
+
+				# Tri des features par ordre décroissant d'importance
+				feat_importances.sort_values(by='Importance', ascending=False, inplace=True)
+
+				fig = plt.figure(figsize = (8,8))
+				plt.bar(x = feat_importances.index, height = feat_importances.Importance)
+				plt.xticks(rotation=90)
+
+				# Tracé d'un diagramme en barres pour visualiser les importances des features
+				st.pyplot(fig)
+
+				#Nouvel entraînement avec 3 variables
+				X_train_new = X_train[['Law','Social support','Press_Freedom']]
+				X_test_new = X_test[['Law','Social support','Press_Freedom']]
+
+				clf = tree.DecisionTreeClassifier(random_state=42) 
+				  
+				clf.fit(X_train_new, y_train)
+
+				col1, col2, col3 = st.columns([2,4,2])
+
+				y_pred = clf.predict(X_test_new)
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col2.caption('Matrice de confusion')
+				col2.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col2.caption('Rapport de classification')
+				col2.dataframe(df_report)
+
+				clf = tree.DecisionTreeClassifier(random_state=42,max_depth = 3) 
+
+				clf.fit(X_train_new, y_train)
+
+				arbre, ax = plt.subplots(figsize=(10, 10)) 
+
+				plot_tree(clf, 
+				          feature_names = ['Law','Social support','Press_Freedom'],
+				          class_names = ['Low','Medium','High'],
+				          filled = True, 
+				          rounded = True)
+
+				st.pyplot(arbre)
 
 			# Afficher le contenu correspondant au modèle sélectionné
 			elif selected_model3 == "Random Forest Classifier":
@@ -1086,9 +1173,21 @@ elif choose == "Modélisations":
 				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
 				st.markdown("- Réechantillonnage")
 
-				# Afficher l'image correspondante
-				image = Image.open("img/modelisations/random 2021 1.png")
-				st.image(image, caption="Matrice de confusion", use_column_width=True)
+				rf = RandomForestClassifier(random_state = 42)
+				rf.fit(X_train, y_train)
+
+				col1, col2, col3 = st.columns([2,4,2])
+
+				y_pred = rf.predict(X_test)
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col2.caption('Matrice de confusion')
+				col2.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col2.caption('Rapport de classification')
+				col2.dataframe(df_report)
 
 			else:
 				st.write("Aucun modèle sélectionné")
@@ -1098,6 +1197,32 @@ elif choose == "Modélisations":
 			#   Longitudinal   #
 			####################
 			df_final = pd.read_csv('datasets/df_final.csv')
+
+			# création de la colonne catégorielle correspondant au score de bonheur, basé sur les tertiles
+			df_final['hapiness_categ'] = pd.qcut(df_final['Life Ladder'], q=[0, 0.33, 0.66, 1], labels=['Low', 'Medium', 'High'])
+			df_final['hapiness_categ'].value_counts()
+
+			# suppression des colonnes inutiles
+			df_final = df_final.drop(['Country name', 'year', 'Life Ladder', 'Positive affect', 'Negative affect'], axis = 1)
+
+			# séparation des variables explicatives et de la variable cible
+			feats = df_final.drop('hapiness_categ', axis = 1)
+			target = df_final.hapiness_categ
+
+			# Création des jeux de données de test et d'entrainement
+			X_train, X_test, y_train, y_test = train_test_split(feats, target, test_size = 0.20, random_state = 42)
+
+			# Standardisation des variables explicatives
+			sc = StandardScaler()
+
+			X_train[X_train.columns] = sc.fit_transform(X_train[X_train.columns])
+			X_test[X_test.columns] = sc.transform(X_test[X_test.columns])
+
+			# Encodage de la variable cible
+			le = LabelEncoder()
+
+			y_train = le.fit_transform(y_train)
+			y_test = le.transform(y_test)
 
 			# Afficher le sous-titre
 			st.markdown("<h3>Dataset 2011 - 2020</h3>", unsafe_allow_html=True)
@@ -1123,15 +1248,45 @@ elif choose == "Modélisations":
 				st.markdown("- Standardisation des VI")
 				st.markdown("- Entrainement 80% / Test 20%")
 				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
-			    
-			    # Afficher l'image correspondante
-				image = Image.open("img/modelisations/reg log longi.png")
-				st.image(image, caption="Matrice de confusion", use_column_width=True)
-			    
-				image = Image.open("img/modelisations/reg log longi 2.png")
-				st.image(image, caption="Hyperparamètres", use_column_width=True)
-			        
 
+				# Application d'un régression logistique
+				reglog = LogisticRegression(random_state = 42)
+				reglog.fit(X_train, y_train)
+
+				col1, col2 = st.columns([6,6])
+
+				col1.caption("Sans hyperparamètres")
+
+				y_pred = reglog.predict(X_test)
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col1.caption('Matrice de confusion')
+				col1.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col1.caption('Rapport de classification')
+				col1.dataframe(df_report)
+
+				col2.caption("Avec hyperparamètres")
+
+				#Nouvelle application de la regression logistique avec modification des hyperparamètre
+				reglog2 = LogisticRegression(C = 0.05963623316594643, penalty = 'l2', solver = 'lbfgs', random_state = 42)
+				reglog2.fit(X_train, y_train)
+
+				# classification_report et matrice de confusion
+				y_pred_2 = reglog2.predict(X_test)
+
+				y_pred = reglog.predict(X_test)
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col2.caption('Matrice de confusion')
+				col2.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col2.caption('Rapport de classification')
+				col2.dataframe(df_report)
 			    
 			# Afficher le contenu correspondant au modèle sélectionné
 			elif selected_model4 == "Arbre de Décision":
@@ -1139,18 +1294,56 @@ elif choose == "Modélisations":
 				st.markdown("- Entrainement 80% / Test 20%")
 				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
 				st.markdown("- Sélection des 3 variables les + influentes et ré-entraînement")
-			       
-			    # Afficher l'image correspondante
-				image = Image.open("img/modelisations/arbre longi 1.png")
-				st.image(image, caption="Poids de chaque variable", use_column_width=True)
-			    
-			    # Afficher l'image correspondante
-				image = Image.open("img/modelisations/arbre longi 2.png")
-				st.image(image, caption="Matrice de confusion", use_column_width=True)
-			    
-				image = Image.open("img/modelisations/arbre longi 3.png")
-				st.image(image, caption="Hyperparamètres", use_column_width=True)
 
+				clf = tree.DecisionTreeClassifier(random_state = 42)
+				clf.fit(X_train, y_train)
+
+				col1, col2, col3 = st.columns([2,4,2])
+
+				y_pred = clf.predict(X_test)
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col2.caption('Matrice de confusion')
+				col2.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col2.caption('Rapport de classification')
+				col2.dataframe(df_report)
+
+				#Rentrainement du modèle avec la modification des hyperparamètres
+				clf2 = tree.DecisionTreeClassifier(max_depth = 3, min_samples_leaf = 2)
+				clf2.fit(X_train, y_train)
+
+				# Création d'un DataFrame pour stocker les importances des features
+				feat_importances = pd.DataFrame(clf2.feature_importances_, index=feats.columns, columns=["Importance"])
+
+				# Tri des features par ordre décroissant d'importance
+				feat_importances.sort_values(by='Importance', ascending=False, inplace=True)
+
+				fig = plt.figure(figsize = (8,8))
+				plt.bar(x = feat_importances.index, height = feat_importances.Importance)
+				plt.xticks(rotation=90)
+
+				# Tracé d'un diagramme en barres pour visualiser les importances des features
+				st.pyplot(fig)
+
+				X_train_new = X_train[['Log GDP per capita','Unemployment rate','Healthy life expectancy at birth']]
+				X_test_new = X_test[['Log GDP per capita','Unemployment rate','Healthy life expectancy at birth']]
+
+				clf2 = tree.DecisionTreeClassifier(random_state=42,max_depth = 3) 
+
+				clf2.fit(X_train_new, y_train)
+
+				arbre, ax = plt.subplots(figsize=(10, 10))  
+
+				plot_tree(clf2, 
+				          feature_names = ['Log GDP per capita','Unemployment rate','Healthy life expectancy at birth'],
+				          class_names = ['Low','Medium','High'],
+				          filled = True, 
+				          rounded = True)
+
+				st.pyplot(arbre)
 
 			# Afficher le contenu correspondant au modèle sélectionné
 			elif selected_model4 == "Random Forest Classifier":
@@ -1158,17 +1351,128 @@ elif choose == "Modélisations":
 				st.markdown("- Entrainement 80% / Test 20%")
 				st.markdown("- Transformation de la variable 'bonheur' en la divisant en trois catégories équilibrées, basées sur des terciles")
 				st.markdown("- Réechantillonnage")
-			       
-			    # Afficher l'image correspondante
-				image = Image.open("img/modelisations/random longi.png")
-				st.image(image, caption="Matrice de confusion", use_column_width=True)
-			    
-				image = Image.open("img/modelisations/random longi 2.png")
-				st.image(image, caption="Hyperparamètres", use_column_width=True)
+
+				col1, col2 = st.columns([6,6])
+
+				col1.caption('Sans hyperparamètres')
+
+				# Random Forest Classifier
+				rf = RandomForestClassifier(random_state=42)
+				rf.fit(X_train, y_train)
+
+				y_pred = rf.predict(X_test)
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col1.caption('Matrice de confusion')
+				col1.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col1.caption('Rapport de classification')
+				col1.dataframe(df_report)
+
+				col2.caption('Avec hyperparamètres')
+				#Réentrainement du modèle avec modification des hyperparamtres
+				rfc1=RandomForestClassifier(random_state=42, max_features='auto', n_estimators= 500, max_depth=8, criterion='gini')
+				rfc1.fit(X_train, y_train)
+
+				y_pred = rfc1.predict(X_test)
+
+				# Affichage de la matrice de confusion et du rapport de classification
+				col2.caption('Matrice de confusion')
+				col2.dataframe(pd.crosstab(y_test,y_pred, rownames=['Realité'], colnames=['Prédiction']))
+
+				report = classification_report(y_test, y_pred, output_dict = True)
+				df_report = pd.DataFrame(report).transpose()
+				col2.caption('Rapport de classification')
+				col2.dataframe(df_report)
 
 			else:
 				st.write("Aucun modèle sélectionné")
 
+	with tab3:
+		# Charger le jeu de données
+		data = pd.read_csv("datasets/df2021_final.csv")
+
+		# Liste des variables dans le jeu de données
+		variables = ['Logged GDP per capita', 'Social support', 'Healthy life expectancy',
+		             'Freedom to make life choices', 'Perceptions of corruption', 'Law',
+		             'Press_Freedom', 'Political_Rights', 'Inequality', 'Schooling',
+		             'Unemployment rate', 'armed_conflicts', 'Generosity']
+
+		# Interface utilisateur pour choisir les variables
+		selected_variables = []
+		for variable in variables:
+		    if st.checkbox(variable):
+		        selected_variables.append(variable)
+
+		if len(selected_variables) == 0:
+		    st.warning("Veuillez sélectionner au moins une variable.")
+		else:
+		    # Variable dépendante
+		    dependent = 'Ladder score'
+
+		    # Séparation des données en jeu d'entraînement et jeu de test
+		    X_train, X_test, y_train, y_test = train_test_split(data[selected_variables], data[dependent],
+		                                                        test_size=0.2, random_state=40)
+
+		    # Création d'un objet StandardScaler
+		    scaler = StandardScaler()
+
+		    # Standardisation des variables prédictives pour le jeu d'entraînement
+		    X_train_scaled = scaler.fit_transform(X_train)
+		    # Remplace les valeurs de X_train par les valeurs standardisées
+		    X_train = pd.DataFrame(X_train_scaled, columns=X_train.columns)
+
+		    # Réinitialiser les indices des données
+		    X_train.reset_index(drop=True, inplace=True)
+		    y_train.reset_index(drop=True, inplace=True)
+
+		    # Création d'un objet modèle de régression linéaire
+		    X_train_with_constant = sm.add_constant(X_train)
+		    model_sm = sm.OLS(y_train, X_train_with_constant)
+
+		    # Entraînement du modèle sur le jeu d'entraînement
+		    model = LinearRegression()
+		    model.fit(X_train, y_train)
+
+		    # Prédictions sur le jeu de test
+		    X_test_scaled = scaler.transform(X_test)
+		    X_test = pd.DataFrame(X_test_scaled, columns=X_test.columns)
+		    y_test_pred = model.predict(X_test)
+
+		    # Métriques sur le jeu de test
+		    mse_test = mean_squared_error(y_test, y_test_pred)
+		    mae_test = mean_absolute_error(y_test, y_test_pred)
+		    r2_test = r2_score(y_test, y_test_pred)
+
+		    # Obtenir les p-values des coefficients
+		    results = model_sm.fit()
+		    p_values = results.pvalues[1:]  # Exclure le coefficient de constante
+
+		    # Récupération des coefficients des variables sélectionnées
+		    coefficients = pd.DataFrame({'Variable': X_train.columns, 'Coefficient': model.coef_})
+
+		    # Affichage des VI sélectionnées avec les coefficients et les p-values
+		    selected_variables_interactive = st.multiselect("Sélectionnez les variables indépendantes", variables,
+		                                                    default=selected_variables, disabled= True)
+
+		    # Récupération des coefficients des variables sélectionnées
+		    coefficients_selected = coefficients[coefficients['Variable'].isin(selected_variables_interactive)]
+
+		    # Affichage du barplot des coefficients
+		    fig, ax = plt.subplots(figsize=(10, 6))
+		    sns.barplot(x='Variable', y='Coefficient', data=coefficients_selected, ax=ax)
+		    ax.set_xticklabels(selected_variables_interactive, rotation=90)
+		    ax.set_ylabel('Coefficient')
+		    ax.set_title('Coefficients des variables indépendantes')
+		    st.pyplot(fig)
+
+		    # Affichage des métriques pour le jeu de test
+		    st.subheader("Métriques sur le jeu de test :")
+		    st.write("Carré Moyen de l'Erreur (MSE) :", mse_test)
+		    st.write("Erreur Absolue Moyenne (MAE) :", mae_test)
+		    st.write("Coefficient de détermination (R2) :", r2_test)
 
 ##################
 #   CONCLUSION   #

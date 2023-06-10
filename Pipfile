@@ -11,6 +11,7 @@ seaborn = "*"
 streamlit-folium = "*"
 folium = "*"
 geopy = "*"
+statsmodels = "*"
 
 [dev-packages]
 
