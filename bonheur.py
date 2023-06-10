@@ -62,6 +62,8 @@ st.markdown(
 	    [data-testid="stVerticalBlock"] > .stTabs [data-testid="stVerticalBlock"] > .stTabs {{ width: 100%; }}
 	    [data-baseweb="checkbox"] [data-testid="stMarkdownContainer"] {{ width: 100% !important }}
 	    div.stSlider {{ width: 50% !important; margin: 0 auto }}
+	    span[aria-disabled="true"] {{ background-color: #263A29 !important; color: #F2E3DB; }}
+	    [data-baseweb="select"] [data-baseweb="icon"] {{ display: none; }}
     </style>
     """,
     unsafe_allow_html=True
@@ -437,11 +439,11 @@ elif choose == "Modélisations":
 				st.markdown("- Standardisation des VI")
 				st.markdown("- Entrainement 80% / Test 20%")
 				st.markdown("- Approche par comparaison de modèles")
-				st.markdown("- Exclusion des variables conflits armés, corruption perçue, droits politiques, inégalités et générosité")
+				st.markdown("- Exclusion des variables conflits armés, droits politiques, inégalités et générosité")
 			    
 			    # Afficher l'équation du modèle de régression linéaire
 				st.write("\n\n- **Equation du modèle:**")
-				st.write("**Bonheur** = 0.46 × PIB + 0.21 × Soutien social + 0.32 × Espérance de vie en bonne santé + 0.19 × Liberté choix de vie - 0.26 × Droit + 0.38 × Liberté presse - 0.18 × Années de scolarité - 0.18 × Chômage")
+				st.write("**Bonheur** = 0.46 × PIB + 0.21 × Soutien social + 0.32 × Espérance de vie en bonne santé + 0.19 × Liberté choix de vie - 0.26 × Droit + 0.38 × Liberté presse - 0.18 × Années de scolarité - 0.18 × Chômage - 0.14 × Corruption perçue")
 			    
 				#Affichage du graphique pour la prédiction du modèle
 				pred_test = model.predict(X_test)
@@ -1411,9 +1413,40 @@ elif choose == "Modélisations":
 
 		# Interface utilisateur pour choisir les variables
 		selected_variables = []
-		for variable in variables:
-		    if st.checkbox(variable):
-		        selected_variables.append(variable)
+
+		st.subheader('Sélectionner les variables à tester')
+
+		col1, col2, col3, col4 = st.columns(4)
+
+		if col1.checkbox(variables[0]):
+			selected_variables.append(variables[0])
+		if col1.checkbox(variables[4]):
+			selected_variables.append(variables[4])
+		if col1.checkbox(variables[8]):
+			selected_variables.append(variables[8])
+		if col1.checkbox(variables[12]):
+			selected_variables.append(variables[12])
+
+		if col2.checkbox(variables[3]):
+			selected_variables.append(variables[3])
+		if col2.checkbox(variables[5]):
+			selected_variables.append(variables[5])
+		if col2.checkbox(variables[9]):
+			selected_variables.append(variables[9])
+
+		if col3.checkbox(variables[2]):
+			selected_variables.append(variables[2])
+		if col3.checkbox(variables[6]):
+			selected_variables.append(variables[6])
+		if col3.checkbox(variables[10]):
+			selected_variables.append(variables[10])
+
+		if col4.checkbox(variables[1]):
+			selected_variables.append(variables[1])
+		if col4.checkbox(variables[7]):
+			selected_variables.append(variables[7])
+		if col4.checkbox(variables[11]):
+			selected_variables.append(variables[11])
 
 		if len(selected_variables) == 0:
 		    st.warning("Veuillez sélectionner au moins une variable.")
@@ -1445,15 +1478,16 @@ elif choose == "Modélisations":
 		    model = LinearRegression()
 		    model.fit(X_train, y_train)
 
+		    # Prédictions sur le jeu d'entraînement
+		    y_train_pred = model.predict(X_train)
+
 		    # Prédictions sur le jeu de test
-		    X_test_scaled = scaler.transform(X_test)
-		    X_test = pd.DataFrame(X_test_scaled, columns=X_test.columns)
 		    y_test_pred = model.predict(X_test)
 
-		    # Métriques sur le jeu de test
-		    mse_test = mean_squared_error(y_test, y_test_pred)
-		    mae_test = mean_absolute_error(y_test, y_test_pred)
-		    r2_test = r2_score(y_test, y_test_pred)
+		    # Métriques sur le jeu d'entraînement
+		    mse_train = mean_squared_error(y_train, y_train_pred)
+		    mae_train = mean_absolute_error(y_train, y_train_pred)
+		    r2_train = r2_score(y_train, y_train_pred)
 
 		    # Obtenir les p-values des coefficients
 		    results = model_sm.fit()
@@ -1463,8 +1497,9 @@ elif choose == "Modélisations":
 		    coefficients = pd.DataFrame({'Variable': X_train.columns, 'Coefficient': model.coef_})
 
 		    # Affichage des VI sélectionnées avec les coefficients et les p-values
-		    selected_variables_interactive = st.multiselect("Sélectionnez les variables indépendantes", variables,
-		                                                    default=selected_variables, disabled= True)
+		    selected_variables_interactive = st.multiselect("Variables indépendantes sélectionnées", variables,
+		                                                    default=selected_variables,
+		                                                    disabled = True)
 
 		    # Récupération des coefficients des variables sélectionnées
 		    coefficients_selected = coefficients[coefficients['Variable'].isin(selected_variables_interactive)]
@@ -1477,11 +1512,11 @@ elif choose == "Modélisations":
 		    ax.set_title('Coefficients des variables indépendantes')
 		    st.pyplot(fig)
 
-		    # Affichage des métriques pour le jeu de test
-		    st.subheader("Métriques sur le jeu de test :")
-		    st.write("Carré Moyen de l'Erreur (MSE) :", mse_test)
-		    st.write("Erreur Absolue Moyenne (MAE) :", mae_test)
-		    st.write("Coefficient de détermination (R2) :", r2_test)
+		    # Affichage des métriques
+		    st.subheader("Métriques sur le jeu d'entraînement :")
+		    st.write("Carré Moyen de l'Erreur (MSE) :", mse_train)
+		    st.write("Erreur Absolue Moyenne (MAE) :", mae_train)
+		    st.write("Coefficient de détermination (R2) :", r2_train)
 
 ##################
 #   CONCLUSION   #
@@ -1494,13 +1529,13 @@ elif choose == "Conclusion":
 	conclu1.write("Les deux meilleurs modèles pour prédire l'indice de bonheur brut national sont la régression linéaire multiple utilisant une approche comparative de modèles et le random forest classifier.")
 	conclu1.write("Nous souhaitions connaître les variables ayant le plus de poids dans le calcul du score de bonheur afin d'en tirer une équation.")
 
-	conclu1.caption("**Bonheur** = 0.46 × PIB + 0.38 × Liberté presse + 0.32 × Espérance de vie en bonne santé - 0.26 × Droit + 0.21 × Soutien social + 0.19 × Liberté choix de vie - 0.18 × Années de scolarité - 0.18 × Chômage")
+	conclu1.caption("**Bonheur** = 0.46 × PIB + 0.21 × Soutien social + 0.32 × Espérance de vie en bonne santé + 0.19 × Liberté choix de vie - 0.26 × Droit + 0.38 × Liberté presse - 0.18 × Années de scolarité - 0.18 × Chômage - 0.14 × Corruption perçue")
 
 	conclu1.write("Inclure graph 'Poids de chaque variable...'")
 
 
 	df2021_final = pd.read_csv("datasets/df2021_final.csv")
-	cols = ['Logged GDP per capita', 'Press_Freedom', 'Healthy life expectancy', 'Law', 'Social support', 'Freedom to make life choices', 'Schooling', 'Unemployment rate']
+	cols = ['Logged GDP per capita', 'Press_Freedom', 'Healthy life expectancy', 'Law', 'Social support', 'Freedom to make life choices', 'Schooling', 'Unemployment rate', 'Perceptions of corruption']
 
 	options = []
 	options.append('Pays')
@@ -1523,11 +1558,18 @@ elif choose == "Conclusion":
 		social_support = ss / 10
 
 		
-		lc = conclu2.slider("**Êtes-vous satisfait de votre liberté à faire des choix de vie ?**\n\n0 = Pas satisfait, 10 = Satisfait",
+		lc = conclu2.slider("**Êtes-vous satisfait de votre liberté de faire des choix de vie ?**\n\n0 = Pas satisfait, 10 = Satisfait",
 			0, 10, 5)
 
 		life_choices = lc / 10
+
+		pc1 = conclu2.slider("**La corruption est-elle répandue au sein du gouvernement ?**\n\n0 = Pas d'accord, 10 = D'accord",
+			0, 10, 5)
+
+		pc2 = conclu2.slider("**La corruption est-elle répandue au sein des entreprises ?**\n\n0 = Pas d'accord, 10 = D'accord",
+			0, 10, 5)
 		
+		perception_corruption = (pc1 + pc2) / 20
 
 		selected_country = option
 
@@ -1538,6 +1580,7 @@ elif choose == "Conclusion":
 
 		df_row['Social support'] = social_support
 		df_row['Freedom to make life choices'] = life_choices
+		df_row['Perceptions of corruption'] = perception_corruption
 
 		X_test = df_row[cols]
 
