@@ -111,14 +111,14 @@ elif choose == "Datasets":
 	colMid.subheader('1.Première étape : La récupération des données')
 	colMid.write("La source principale des données est le [World Happiness Report](https://worldhappiness.report/), une enquête phare sur l'état du bonheur mondial.")
 	colMid.write("Deux jeux de données de type csv ont pu être téléchargé sur [Kaggle](https://www.kaggle.com/ajaypalsinghlo/world-happiness-report-2021): ")
-	
-	with st.expander("le World Happiness Report"):
-		whr = pd.read_csv('datasets/world-happiness-report.csv')
-		st.dataframe(whr)
 
 	with st.expander("le World Happiness Report 2021"):
 		whr2021 = pd.read_csv('datasets/world-happiness-report-2021.csv')
 		st.dataframe(whr2021)
+	
+	with st.expander("le World Happiness Report"):
+		whr = pd.read_csv('datasets/world-happiness-report.csv')
+		st.dataframe(whr)
 
 	colLeft, colMid, colRight = st.columns([1, 8, 1])
 	colMid.write("\n\n")
@@ -1573,10 +1573,10 @@ elif choose == "Conclusion":
 
 	colMid.subheader("Conclusion")
 
-	colMid.write("Les deux meilleurs modèles pour prédire l'indice de bonheur brut national sont la régression linéaire multiple utilisant une approche comparative de modèles et le random forest classifier.")
-	colMid.write("Nous souhaitions connaître les variables ayant le plus de poids dans le calcul du score de bonheur afin d'en tirer une équation.")
-	colMid.write("\n\n")
-	colMid.write("\n\n")
+	colMid.write("Nous souhaitions proposer un modèle performant dans la prédiction du bonheur. Après avoir entraîné et testé un total de 14 modèles, nous sommes en mesure de proposer deux modèles selon l'objectif souhaité :")
+	colMid.markdown("- la régression linéaire multiple (sur le dataset 2021) utilisant une approche comparative de modèles pour prédire un score exact de bonheur")
+	colMid.markdown("- le random forest classifier (sur le dataset longitudinal) pour prédire dans quelle catégorie de bonheur se situe un pays")
+	colMid.write("Nous souhaitions également quantifier l'effet de chaque variable sur le score de bonheur d'un pays. Il est possible de déduire le poids relatif de chaque variable à partir des coefficients Bêtas de l'équation de régression suivante (les variables prédictives sont centrées-réduites):")
 
 	colMid.markdown("<h5>Bonheur = 0.46 × PIB + 0.21 × Soutien social + 0.32 × Espérance de vie en bonne santé + 0.19 × Liberté choix de vie - 0.26 × Droit + 0.38 × Liberté presse - 0.18 × Années de scolarité - 0.18 × Chômage - 0.14 × Corruption perçue</h5>", unsafe_allow_html=True)
 	colMid.write("\n\n")
@@ -1585,6 +1585,7 @@ elif choose == "Conclusion":
 	variables = ['PIB', 'Liberté Presse', 'Santé',
              'Droit', 'Soutien Social', 'Scolarité', 'Liberté Vie', 'Chômage',
              'Corruption Perçue']
+
 	coefficients = [0.4570331728929467, 0.3824984257759499, 0.31686315162364254, -0.2627542194623681,
 	                0.21160954293664438, -0.18416223137371948, 0.19481694441003133, -0.17599495021472106,
 	                -0.14400512347906697]
@@ -1594,12 +1595,12 @@ elif choose == "Conclusion":
 	upper_bounds = [0.6915026168907512, 0.5073967305236755, 0.4970417815039805, -0.05710510235515917,
 	                0.3549276360598872, -0.03620810878033123, 0.30466638851696204, -0.07789706876150237,
 	                -0.04115704379301119]
+
 	fig, ax = plt.subplots()
 	colors = ['#E86A33' if c < 0 else '#41644A' for c in coefficients]
 	ax.bar(variables, coefficients, yerr=[np.subtract(coefficients, lower_bounds), np.subtract(upper_bounds, coefficients)], capsize=5, color=colors)
 	ax.set_ylabel('Coefficients')
-	ax.set_xlabel('Variables')
-	ax.set_title('Poids des variables dans la régression linéaire finale')
+	ax.set_title("Influence de chaque variable sur le bonheur d'un pays")
 	plt.xticks(rotation=90)
 
 	colImgLeft, colImgMid, colImgRight = st.columns([2, 8, 2])
