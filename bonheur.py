@@ -1518,13 +1518,13 @@ elif choose == "Conclusion":
 		conclu2 = st.container()
 
 		ss = conclu2.slider("**Lorsque vous avez des soucis, avez-vous des proches sur qui compter ?**\n\n0 = Pas d'accord, 10 = D'accord",
-			0, 10)
+			0, 5, 10)
 
 		social_support = ss / 10
 
 		
 		lc = conclu2.slider("**Êtes-vous satisfait de votre liberté à faire des choix de vie ?**\n\n0 = Pas satisfait, 10 = Satisfait",
-			0, 10)
+			0, 5, 10)
 
 		life_choices = lc / 10
 		
