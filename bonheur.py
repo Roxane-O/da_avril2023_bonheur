@@ -61,6 +61,7 @@ st.markdown(
 	    [data-testid="stVerticalBlock"] > .stTabs {{ width: 80%; margin: 0 auto; }}
 	    [data-testid="stVerticalBlock"] > .stTabs [data-testid="stVerticalBlock"] > .stTabs {{ width: 100%; }}
 	    [data-baseweb="checkbox"] [data-testid="stMarkdownContainer"] {{ width: 100% !important }}
+	    div.stSlider {{ width: 50% !important; margin: 0 auto }}
     </style>
     """,
     unsafe_allow_html=True
@@ -1516,13 +1517,13 @@ elif choose == "Conclusion":
 	else:
 		conclu2 = st.container()
 
-		ss = conclu2.slider("Lorsque vous avez des soucis, avez-vous des proches sur qui compter ? 0 = Pas d'accord, 10 = D'accord",
+		ss = conclu2.slider("**Lorsque vous avez des soucis, avez-vous des proches sur qui compter ?**\n\n0 = Pas d'accord, 10 = D'accord",
 			0, 10)
 
 		social_support = ss / 10
 
 		
-		lc = conclu2.slider("Êtes-vous satisfait de votre liberté à faire des choix de vie ? 0 = Pas satisfait, 10 = Satisfait",
+		lc = conclu2.slider("**Êtes-vous satisfait de votre liberté à faire des choix de vie ?**\n\n0 = Pas satisfait, 10 = Satisfait",
 			0, 10)
 
 		life_choices = lc / 10
@@ -1549,16 +1550,16 @@ elif choose == "Conclusion":
 		pred_test = model.predict(X_test)
 
 
-		col1, col2, col3 = st.columns(3)
+		col1, col2, col3, col4, col5 = st.columns([1,3,3,3,1])
 
-		col1.write("Score de bonheur personnel : ")
-		col1.write(pred_test.item())
+		col2.write("**Score de bonheur personnel :**")
+		col2.write(np.round(pred_test.item(), 2))
 
-		col2.write("Pays sélectionné :")
-		col2.write(df_row["Country name"].item())
+		col3.write("**Pays sélectionné :**")
+		col3.write(df_row["Country name"].item())
 
-		col3.write("Score général du pays :")
-		col3.write(df_row["Ladder score"].item())
+		col4.write("**Score général du pays :**")
+		col4.write(df_row["Ladder score"].item())
 
 
 
