@@ -1567,7 +1567,7 @@ elif choose == "Modélisations":
 ##############
 #   CARTES   #
 ##############
-elif choose == "Cartes":
+elif choose == "Carte":
 
 	colLeft, colMid, colRight = st.columns([1, 8, 1])
 	colMid.subheader("Carte du monde selon le score de bonheur")
