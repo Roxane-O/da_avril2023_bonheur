@@ -61,15 +61,15 @@ st.markdown(
     )
 
 with menu:
-	choose = option_menu(None,["Introduction", "Datasets", "Visualisations", "Modélisations", "Conclusion", "Quiz"],
-		icons=['globe-americas', 'database', 'bar-chart-line', 'calculator', 'emoji-smile', 'patch-question'],
+	choose = option_menu(None,["Introduction", "Datasets", "Visualisations", "Modélisations", "Cartes", "Conclusion", "Quiz"],
+		icons=['clipboard2-data', 'database', 'bar-chart-line', 'calculator', 'globe-europe-africa', 'emoji-smile', 'patch-question'],
 		default_index=0,
 		orientation="horizontal",
 		styles={
 			"container": {"padding": "5!important", "background-color": "#41644A", "border-radius" : "4px"},
-			"icon": {"font-size": "25px", "vertical-align" : "middle"}, 
-			"nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px", "color": "#F2E3DB", "--hover-color": "rgba(242, 227, 219, 0.3)"},
-			"nav-link-selected": {"background-color": "#F2E3DB", "color" : "#41644A"},
+			"icon": {"font-size": "1rem", "vertical-align" : "middle"}, 
+			"nav-link": {"font-size": "0.8rem", "text-align": "center", "margin":"0px", "color": "#F2E3DB", "--hover-color": "rgba(242, 227, 219, 0.3)"},
+			"nav-link-selected": {"background-color": "#F2E3DB", "color" : "#41644A", "border-radius" : "3px"},
 		}
 	)
 
@@ -1564,6 +1564,155 @@ elif choose == "Modélisations":
 		    # Affichage des métriques
 		    st.write("Part de variance expliquée (R2) :", r2_train)
 
+##############
+#   CARTES   #
+##############
+elif choose == "Cartes":
+
+	colLeft, colMid, colRight = st.columns([1, 8, 1])
+	colMid.subheader("Carte du monde selon le score de bonheur")
+
+	with st.spinner('En cours de chargement'):
+
+		df1 = pd.read_csv('datasets/df2021_final.csv')
+
+		# Variables prédictives
+		predictors = ['Logged GDP per capita', 'Social support', 'Healthy life expectancy',
+		              'Freedom to make life choices', 'Perceptions of corruption', 'Law',
+		              'Press_Freedom', 'Political_Rights', 'Inequality', 'Schooling',
+		              'Unemployment rate', 'armed_conflicts', 'Generosity']
+
+		# Variable dépendante
+		dependent = 'Ladder score'
+
+
+		# Séparation des données en jeu d'entraînement et jeu de test en maintenant une moyenne similaire
+		X_train, X_test, y_train, y_test = train_test_split(df1[predictors], df1[dependent], test_size=0.2, random_state=40)
+
+		# Colonnes à inclure dans le DataFrame
+		columns = ['Logged GDP per capita', 'Social support', 'Healthy life expectancy',
+		           'Freedom to make life choices', 'Perceptions of corruption', 'Law',
+		           'Press_Freedom', 'Political_Rights', 'Inequality', 'Schooling',
+		           'Unemployment rate', 'armed_conflicts', 'Generosity']
+
+		# Extraction des colonnes du jeu de données
+		X_train = X_train[columns]
+		X_test = X_test[columns]
+
+		# Création d'un objet StandardScaler avec les paramètres souhaités
+		scaler = StandardScaler(with_mean=True, with_std=True)
+
+		# Mise à l'échelle des données d'entraînement
+		X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=columns)
+
+		# Mise à l'échelle des données de test
+		X_test = pd.DataFrame(scaler.transform(X_test), columns=columns)
+
+		X_train = X_train.drop(['armed_conflicts', 'Generosity', 'Inequality', 'Political_Rights'], axis = 1)
+		X_test = X_test.drop(['armed_conflicts', 'Generosity', 'Inequality', 'Political_Rights'], axis = 1)
+
+		# Création d'un objet modèle de régression linéaire
+		model = LinearRegression()
+
+		# Entraînement du modèle sur le jeu d'entraînement avec la constante
+		model.fit(X_train, y_train)
+
+		scaler = StandardScaler()
+		X_scaled = scaler.fit_transform(df1[['Logged GDP per capita', 'Social support', 'Healthy life expectancy',
+		                                   'Freedom to make life choices', 'Perceptions of corruption', 'Law',
+		                                   'Press_Freedom', 'Schooling', 'Unemployment rate']])
+
+		X_scaled_df = pd.DataFrame(X_scaled, columns=['Logged GDP per capita', 'Social support', 'Healthy life expectancy',
+		                                              'Freedom to make life choices', 'Perceptions of corruption', 'Law',
+		                                              'Press_Freedom', 'Schooling', 'Unemployment rate'])
+
+		df1['Bonheur prédit'] = model.predict(X_scaled_df)
+
+		geolocator = Nominatim(user_agent='myapplication')
+
+		latitudes = []
+		longitudes = []
+
+		#Boucle pour remplir les listes à partir des noms de pays du df1
+		for country in df1['Country name']:
+		    try:
+		        location = geolocator.geocode(country, timeout=10)
+		        if location:
+		            latitudes.append(location.latitude)
+		            longitudes.append(location.longitude)
+		        else:
+		            latitudes.append(None)
+		            longitudes.append(None)
+		    except GeocoderTimedOut as e:
+		        print("Error: geocode failed on input %s with message %s" % (country, e))
+		        latitudes.append(None)
+		        longitudes.append(None)
+		        
+		#Coordonnées
+		coordinates = list(zip(latitudes, longitudes))
+
+		df1['latitude']=latitudes
+		df1['longitude']=longitudes
+
+		# Correction des coordonnés (à poursuivre)
+		df1.loc[df1['Country name'] == 'Georgia', ['latitude', 'longitude']] = [42, 43.3]
+		df1.loc[df1['Country name'] == 'Taiwan Province of China', ['latitude', 'longitude']] = [25.03, 121.3]
+		df1.loc[df1['Country name'] == 'Hong Kong S.A.R. of China', ['latitude', 'longitude']] = [22.39, 114.109497]
+
+		# Charger les données GeoJSON des pays
+		with open('json/world-countries.json') as f:
+		    geo_data = json.load(f)
+
+		# Créer une carte centrée sur le monde
+		m = folium.Map(location=[0, 0], zoom_start=2)
+
+		# Créer une fonction pour définir la couleur en fonction du score Ladder
+		def get_color(score):
+		    if score > 7.5:
+		        return 'darkgreen'
+		    elif score > 7:
+		        return 'green'
+		    elif score > 6.5:
+		        return 'lightgreen'
+		    elif score > 6:
+		        return 'beige'
+		    elif score > 5.5:
+		        return 'orange'
+		    else:
+		        return 'red'
+
+		# Ajouter une couche de remplissage à la carte pour chaque pays basé sur le score observé
+		folium.Choropleth(
+		    geo_data=geo_data,
+		    name='choropleth',
+		    data=df1,
+		    columns=['Country name', 'Ladder score'],
+		    key_on='feature.properties.name',
+		    fill_color='PiYG',
+		    fill_opacity=0.7,
+		    line_opacity=0.2,
+		    legend_name='Bonheur observé',
+		    highlight=True,
+		    overlay=True,
+		    show=False,
+		    nan_fill_color='white'
+		).add_to(m)
+
+		# Parcourir le dataframe et ajouter un marqueur pour chaque pays avec les scores observés et prédits
+		for index, row in df1.iterrows():
+		    pays = row['Country name']
+		    score_obs = row['Ladder score']
+		    score_pred = row['Bonheur prédit']
+		    coord = (row['latitude'], row['longitude'])
+		    
+		    tooltip_text = f"{pays}<br>Bonheur OBSERVE: {score_obs}<br>Bonheur PREDIT: {score_pred}"
+		    
+		    folium.Marker(location=coord, 
+		                  icon=folium.Icon(color=get_color(score_obs)), 
+		                  tooltip=tooltip_text).add_to(m)
+
+		output = st_folium(m, width=1114, height=500)
+
 ##################
 #   CONCLUSION   #
 ##################
@@ -1618,7 +1767,7 @@ elif choose == "Quiz":
 	colLeft, colMid, colRight = st.columns([1, 8, 1])
 
 	colMid.markdown("<h3 style = 'text-align: center;'>Quizz Bonheur: êtes-vous heureux?</h3>", unsafe_allow_html=True)
-	colMid.caption("Répondez à quelques question et découvrez votre score de bonheur.")
+	colMid.caption("Répondez à quelques questions et découvrez votre score de bonheur.")
 
 	df2021_final = pd.read_csv("datasets/df2021_final.csv")
 	cols = ['Logged GDP per capita', 'Press_Freedom', 'Healthy life expectancy', 'Law', 'Social support', 'Freedom to make life choices', 'Schooling', 'Unemployment rate', 'Perceptions of corruption']
