@@ -61,7 +61,7 @@ st.markdown(
     )
 
 with menu:
-	choose = option_menu(None,["Introduction", "Datasets", "Visualisations", "Modélisations", "Cartes", "Conclusion", "Quiz"],
+	choose = option_menu(None,["Introduction", "Datasets", "Visualisations", "Modélisations", "Carte", "Conclusion", "Quiz"],
 		icons=['clipboard2-data', 'database', 'bar-chart-line', 'calculator', 'globe-europe-africa', 'emoji-smile', 'patch-question'],
 		default_index=0,
 		orientation="horizontal",
