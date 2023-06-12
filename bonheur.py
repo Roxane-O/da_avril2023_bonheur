@@ -86,7 +86,7 @@ if choose == "Introduction":
 	colMid.image('img/globe_beach.jpg')
 	colMid.write("\n\n")
 	colMid.write("\n\n")
-	colMid.write("Ce projet a été réalisé dans le cadre de la formation Data Analyst au sein de l’organisme Data Scientest. Pour répondre à cette question, nous observé des facteurs politiques, économiques et sociaux.")
+	colMid.write("Ce projet a été réalisé dans le cadre de la formation Data Analyst au sein de l’organisme Data Scientest. Pour répondre à cette question, nous avons observé des facteurs politiques, économiques et sociaux.")
 	colMid.write("\n\n")
 	colMid.markdown("<h4>OBJECTIFS</h4>", unsafe_allow_html=True)
 	colMid.markdown("- Déterminer quels sont les facteurs pouvant expliquer le bonheur, mais aussi le poids de chaque facteur, et donc de comprendre les raisons pour lesquelles un pays est mieux classé qu’un autre.")
