@@ -1416,6 +1416,12 @@ elif choose == "Modélisations":
 				rf = RandomForestClassifier(random_state=42)
 				rf.fit(X_train, y_train)
 
+				colMetLeft.write("score Entrainement")
+				colMetLeft.write(np.round(rf.score(X_train, y_train), 2))
+
+				colMetLeft.write("score Test")
+				colMetLeft.write(np.round(rf.score(X_test, y_test), 2))
+
 				y_pred = rf.predict(X_test)
 
 				# Affichage de la matrice de confusion et du rapport de classification
@@ -1431,6 +1437,12 @@ elif choose == "Modélisations":
 				#Réentrainement du modèle avec modification des hyperparamtres
 				rfc1=RandomForestClassifier(random_state=42, max_features='auto', n_estimators= 500, max_depth=8, criterion='gini')
 				rfc1.fit(X_train, y_train)
+
+				colMetRight.write("score Entrainement")
+				colMetRight.write(np.round(rfc1.score(X_train, y_train), 2))
+
+				colMetRight.write("score Test")
+				colMetRight.write(np.round(rfc1.score(X_test, y_test), 2))
 
 				y_pred = rfc1.predict(X_test)
 
